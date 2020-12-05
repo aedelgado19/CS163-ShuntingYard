@@ -13,19 +13,18 @@ struct Node{
 
 // stack and queue function prototypes **********
 void push(Node* &headOfStack, char* data);
-char* pop();
+void pop(Node* &headOfStack);
 char* peek(Node* &headOfStack);
 void display();
 void enqueue();
 void dequeue();
-// helper functions *************
+// helper functions ****************************
 bool isEmpty(Node* &head);
-// *****************************
+// *********************************************
 
 //takes in data, creates a new node, and stacks it on top of stack LL
 void push(Node* &headOfStack, char* data){
-  //NOTE: headOfStack is never set so this will seg fault (it's null rn)
-  
+  //NOTE: headOfStack is never set so this will seg fault (it's null rn)  
   Node *temp = new Node;
   Node *traverse = headOfStack;
   temp->data = data;
@@ -58,6 +57,19 @@ char* peek(Node *&headOfStack){
   }
   cout << "Peek: returning null." << endl;
   return NULL;
+}
+
+void pop(Node* &headOfStack){
+  Node* temp = new Node;
+  if(headOfStack != NULL){
+    temp = headOfStack;
+    headOfStack = headOfStack->next;
+    temp->next = NULL;
+    delete(temp);
+    cout << "Pop: deleted head" << endl;
+  } else {
+    cout << "Pop: head of stack is null" << endl;
+  }
 }
 
 int main(){
