@@ -1,28 +1,31 @@
 //binary tree node class. contains left and right pointer
-#include <BinaryTree.h>
+#include "BinaryTree.h"
+#include <iostream>
+#include <cstring>
+using namespace std;
 
-void BinaryTree::setData(inputdata){
+void btNode::setData(char *inputdata){
   strcpy(data, inputdata);
 }
 
-void BinaryTree::setRightPtr(Node* rPtr){
+void btNode::setRightPtr(btNode* rPtr){
   //do this
 
 }
 
-void BinaryTree::setLeftPtr(Node* lPtr){
+void btNode::setLeftPtr(btNode* lPtr){
   //do this
 
 }
 
-char* BinaryTree::getData(){
+char* btNode::getData(){
   return data;
 }
 
-Node* BinaryTree::getRightPtr(){
+btNode* btNode::getRightPtr(){
   return rightPtr;
 }
 
-Node* BinaryTree::getLeftPtr(){
+btNode* btNode::getLeftPtr(){
   return leftPtr;
 }
