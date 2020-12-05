@@ -1,16 +1,16 @@
 //header file for BinaryTree node class. contains left and right ptr
 
-class Node {
+class btNode {
 public:
   void setData(char* inputdata);
-  void setRightPtr(Node* rPtr);
-  void setLeftPtr(Node *lPtr);
+  void setRightPtr(btNode* rPtr);
+  void setLeftPtr(btNode *lPtr);
   char* getData();
-  Node* getRightPtr();
-  Node* getLeftPtr();
+  btNode* getRightPtr();
+  btNode* getLeftPtr();
   
 private:
   char* data;
-  Node *leftPtr;
-  Node *rightPtr;
+  btNode *leftPtr;
+  btNode *rightPtr;
 };
