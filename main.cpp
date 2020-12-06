@@ -16,29 +16,76 @@ struct Node{
 void push(Node* &headOfStack, char* inData);
 char* pop(Node* &headOfStack);
 char* peek(Node* &headOfStack);
-void display(Node* &headOfStack);
-void enqueue(Node* headOfQueue, char* inData);
-void dequeue();
+void displayStack(Node* &headOfStack);
+void enqueue(Node*& headOfQueue, char* inData);
+char* dequeue(Node*& headOfQueue);
+void displayQueue(Node* &headOfQueue);
 // helper functions ****************************
 bool isEmpty(Node* &head);
 // *********************************************
 
 //adds a new node after the last one and moves "last" to next
 void enqueue(Node* &headOfQueue, char* inData){
-    
+  Node* newnode = new Node;
+  Node* traverse = NULL;
+  int dataSize = strlen(inData);
+  newnode->data = new char[dataSize];
+  if(headOfQueue == NULL){ //no head yet, so make head
+    headOfQueue = newnode;
+    strcpy(newnode->data, inData);
+    newnode->next = NULL;
+  } else {
+    traverse = headOfQueue;
+    while(traverse->next != NULL){
+      traverse = traverse->next;
+    }
+    //out of loop, found end
+    traverse->next = newnode;
+    strcpy(newnode->data, inData);
+    newnode->next = NULL;
+  }
 }
 
-//removes top node and moves next node to "top"
-void dequeue(Node* &headOfQueue){
-    
+//removes top node and makes next node to "top"
+char* dequeue(Node* &headOfQueue){
+  Node* temp = NULL;
+  if(headOfQueue != NULL){
+    int dataSize = strlen(headOfQueue->data); //used in line below
+    char* backupData = new char[dataSize];
+    temp = headOfQueue; //copy original head
+    headOfQueue = temp->next; //update head
+    temp->next = NULL; //disconnect chain
+    strcpy(backupData, temp->data);
+    delete temp;
+    return backupData;
+  } else {
+    cout << "Queue is empty. " << endl;
+  }
+  return NULL;
+}
+
+//used for debug, displays entire queue
+void displayQueue(Node* &headOfQueue){
+  int count = 1;
+  if(headOfQueue != NULL){
+    Node* traverse = headOfQueue;
+    cout << "head: " << traverse->data << endl;
+    while(traverse->next != NULL){
+      traverse = traverse->next;
+      cout << count << ": " << traverse->data << endl; 
+      count++;
+    }
+  }
 }
 
 //takes in data, creates a new node, and stacks it on top of stack LL
 void push(Node* &headOfStack, char* inData){
   Node* newnode = new Node;
+  int dataSize = strlen(inData);
+  newnode->data = new char[dataSize];
   if(headOfStack == NULL){
     headOfStack = newnode;
-    newnode->data = inData;
+    strcpy(newnode->data, inData);
     newnode->next = NULL;
   } else {
     newnode->next = headOfStack;
@@ -71,9 +118,8 @@ char* peek(Node *&headOfStack){
 //delete head of stack
 char* pop(Node* &headOfStack){
   Node* temp = new Node;
-
   if(headOfStack != NULL){
-    int dataSize = strlen(headOfStack->data);
+    int dataSize = strlen(headOfStack->data); //used in line below
     char* backupData = new char[dataSize];
     temp = headOfStack; //original head
     headOfStack = headOfStack->next; //new "head"
@@ -88,7 +134,7 @@ char* pop(Node* &headOfStack){
 }
 
 //used for debug, displays entire stack
-void display(Node* &headOfStack){
+void displayStack(Node* &headOfStack){
   Node* traverse = NULL;
   int count = 1;
   if(headOfStack != NULL){
@@ -113,6 +159,6 @@ int main(){
   cin.get(input, 100);
   cin.get();
   */
-
+    
   return 0;
 }
