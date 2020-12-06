@@ -16,6 +16,7 @@ struct Node{
 void push(Node* &headOfStack, char* inData);
 char* pop(Node* &headOfStack);
 char* peek(Node* &headOfStack);
+void display(Node* &headOfStack);
 void enqueue(Node* headOfQueue, char* inData);
 void dequeue();
 // helper functions ****************************
@@ -34,7 +35,7 @@ void dequeue(Node* &headOfQueue){
 
 //takes in data, creates a new node, and stacks it on top of stack LL
 void push(Node* &headOfStack, char* inData){
-  Node* newnode = NULL;
+  Node* newnode = new Node;
   if(headOfStack == NULL){
     headOfStack = newnode;
     newnode->data = inData;
@@ -60,12 +61,10 @@ bool isEmpty(Node *&head){
 char* peek(Node *&headOfStack){
   bool empty = isEmpty(headOfStack);
   if(empty == false){ 
-    cout << "Peek: not an empty stack!" << endl;
     return headOfStack->data;
   } else {
     cout << "Peek: Empty stack. " << endl;
   }
-  cout << "Peek: returning null." << endl;
   return NULL;
 }
 
@@ -81,24 +80,39 @@ char* pop(Node* &headOfStack){
     temp->next = NULL; //disconnect original from next
     strcpy(backupData, temp->data);
     delete(temp);
-    cout << "Pop: deleted head" << endl;
     return backupData;
   } else {
-    cout << "Pop: head of stack is null" << endl;
+    cout << "head of stack is null!" << endl;
   }
   return NULL;
+}
+
+//used for debug, displays entire stack
+void display(Node* &headOfStack){
+  Node* traverse = NULL;
+  int count = 1;
+  if(headOfStack != NULL){
+    traverse = headOfStack;
+    cout << "head: " << traverse->data << endl;
+    while(traverse->next != NULL){
+      traverse = traverse->next;
+      cout << count << ": " << traverse->data << endl;
+      count++;
+    }
+  }
 }
 
 int main(){
   Node* headOfStack = NULL;
   Node* headOfQueue = NULL;  
   char input[100];
-  cout << "Welcome to Shunting Yard." << endl;
+  cout << "Welcome to Shunting Yard." << endl; /*
   cout << "Please enter your mathematical expression in INFIX notation. " << endl;
   cout << "Use spaces to separate each token, including parenthesis." << endl;
   cout << "Acceptable tokens: +, -, *, /, ^, ( ), and integer numbers." << endl;
   cin.get(input, 100);
   cin.get();
+  */
 
   return 0;
 }
