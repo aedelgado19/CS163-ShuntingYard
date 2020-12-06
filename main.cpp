@@ -1,5 +1,7 @@
-/* Author: Allison Delgado
+/* Author: Allison DOAelgado
  * Last updated: December 5, 2020
+ * This program uses the Shunting Yard Algorithm to
+ * turn an infix expression into prefix, infix, or postfix notation
  */
 
 #include <iostream>
@@ -22,6 +24,7 @@ char* dequeue(Node*& headOfQueue);
 void displayQueue(Node* &headOfQueue);
 // helper functions ****************************
 bool isEmpty(Node* &head);
+char* parseInput(char* input);
 // *********************************************
 
 //adds a new node after the last one and moves "last" to next
@@ -147,18 +150,55 @@ void displayStack(Node* &headOfStack){
     }
   }
 }
+char* parseInput(char* input){
+  cout << "A" << endl;
+  char *token = strtok(input, " ");
+  while(token != NULL){
+    cout << "B" << endl;
+    token = strtok(NULL, " ");
+  }
+  cout << "C" << endl;
+  return token;
+}
 
 int main(){
   Node* headOfStack = NULL;
   Node* headOfQueue = NULL;  
+  char* parsed = new char[100];
   char input[100];
-  cout << "Welcome to Shunting Yard." << endl; /*
+  int choice = 0;
+  bool valid = false;
+  cout << "Welcome to Shunting Yard." << endl;
   cout << "Please enter your mathematical expression in INFIX notation. " << endl;
   cout << "Use spaces to separate each token, including parenthesis." << endl;
   cout << "Acceptable tokens: +, -, *, /, ^, ( ), and integer numbers." << endl;
   cin.get(input, 100);
   cin.get();
-  */
-    
+
+  //do conversions here
+  while(valid == false){
+    cout << "Would you like to output the expression in: " << endl;
+    cout << "(1) infix notation" << endl;
+    cout << "(2) prefix notation" << endl;
+    cout << "(3) postfix notation" << endl;
+    cin >> choice;
+    cin.get();
+    if (choice == 1){ //infix
+
+    }
+    else if (choice == 2){ //prefix
+
+    }
+    else if (choice == 3){ //postfix
+
+    }
+    else {
+      cout << "That was not a valid choice. Please try again: " << endl;
+    }
+  }
+  cout << "poop" << endl;
+  strcpy(parsed, parseInput(input));
+  cout << "pee" << endl;
+  cout << " :) " << parsed << endl;
   return 0;
 }
