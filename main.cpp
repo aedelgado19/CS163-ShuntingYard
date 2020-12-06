@@ -9,6 +9,17 @@
 #include "BinaryTree.h"
 using namespace std;
 
+//ascii values for legal input options
+#define ZERO 48
+#define NINE 57
+#define LBRACK 40
+#define RBRACK 41
+#define MULT 42
+#define ADD 43
+#define SUB 45
+#define DIV 47
+#define POW 94 
+
 struct Node{
   char* data;
   Node *next;
@@ -18,13 +29,15 @@ struct Node{
 void push(Node* &headOfStack, char* inData);
 char* pop(Node* &headOfStack);
 char* peek(Node* &headOfStack);
+bool isEmpty(Node* &head);
 void displayStack(Node* &headOfStack);
 void enqueue(Node*& headOfQueue, char* inData);
 char* dequeue(Node*& headOfQueue);
 void displayQueue(Node* &headOfQueue);
-// helper functions ****************************
-bool isEmpty(Node* &head);
-char* parseInput(char* input);
+// Shunting Yard functions *********************
+int checkType(char token);
+void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token);
+int checkPrecedence(char token);
 // *********************************************
 
 //adds a new node after the last one and moves "last" to next
@@ -150,15 +163,71 @@ void displayStack(Node* &headOfStack){
     }
   }
 }
-char* parseInput(char* input){
-  cout << "A" << endl;
-  char *token = strtok(input, " ");
-  while(token != NULL){
-    cout << "B" << endl;
-    token = strtok(NULL, " ");
+
+// sort token onto stack or queue based on what it is
+void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token){
+  int pNum = checkPrecedence(token); //the p in pNum stands for precendence
+  if(tokenType == 1){ //it is a number
+    push(headOfStack, token);
   }
-  cout << "C" << endl;
-  return token;
+  else if(tokenType == 2){ //it is a left parenthesis
+    push(headOfStack, token);
+  }
+  else if(tokenType == 3){ //it is a right parenthesis
+    //oh god we deal with this later
+  }
+  else if(tokenType == 4){ //it is an operator
+    while(headOfQueue != NULL && pNum) {
+
+    }
+  }
+  else { //something's wrong if this else fires
+    cout << "Error in sorting token, unknown token is passed." << endl;
+  }
+}
+
+//checks the type of token, returns a num based on type.
+//this num can also be used to show precedence
+// 1 = num, 2 = ( , 3 = ) , 4 = +, 5 = -, 6 = /, 7 = *, 8 = ^
+int checkType(char token){
+  if((int)token >= ZERO && <= NINE){
+    return 1; //this is a number
+  }
+  else if((int) token == LBRACK){
+    return 2; // this is a left bracket
+  }
+  else if((int) token == RBRACK){
+    return 3; //this is a right bracket
+  }
+  else if((int) token == ADD){
+    return 4; //this is a +
+  }
+  else if((int) token == SUB){
+    return 5; //this is a -
+  }
+  else if((int) token == DIV){
+    return 6; //this is a /
+  }
+  else if((int) token == MULT){
+    return 7; //this is a *
+  }
+  else if((int) token == POW){
+    return 8; //this is a ^
+  }
+  return 0;
+}
+
+int checkPrecendence(char token){
+  int tokenType = checkType(token);
+  if(tokenType == 8){ //highest precedence: ^
+    return 3;
+  }
+  else if(tokenType == 6 || tokenType == 7){
+    return 2; //medium precendence: * and /
+  }
+  else if(tokenType == 4 || tokenType == 5){
+    return 1; //lowest precedence: + and -
+  }
 }
 
 int main(){
@@ -168,6 +237,7 @@ int main(){
   char input[100];
   int choice = 0;
   bool valid = false;
+  int tokenType = 0;
   cout << "Welcome to Shunting Yard." << endl;
   cout << "Please enter your mathematical expression in INFIX notation. " << endl;
   cout << "Use spaces to separate each token, including parenthesis." << endl;
@@ -175,7 +245,16 @@ int main(){
   cin.get(input, 100);
   cin.get();
 
-  //do conversions here
+  //parse input
+  char *token = strtok(input, " ");
+  while(token != NULL){
+    token = strtok(NULL, " ");
+    tokenType = checkType(token);
+    sortToken(headOfStack, headOfQueue, tokenType, token);
+  }
+  
+  
+  //outputting choices
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
     cout << "(1) infix notation" << endl;
