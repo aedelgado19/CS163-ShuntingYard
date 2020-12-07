@@ -12,13 +12,6 @@ using namespace std;
 //ascii values for legal input options
 #define ZERO 48
 #define NINE 57
-#define LPAR 40
-#define RPAR 41
-#define MULT 42
-#define ADD 43
-#define SUB 45
-#define DIV 47
-#define POW 94 
 
 struct Node{
   char* data;
@@ -35,9 +28,9 @@ void enqueue(Node*& headOfQueue, char* inData);
 char* dequeue(Node*& headOfQueue);
 void displayQueue(Node* &headOfQueue);
 // Shunting Yard functions *********************
-int checkType(char token);
-void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token);
-int checkPrecedence(char token);
+int checkType(char* token);
+void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token);
+int checkPrecedence(char* token);
 // *********************************************
 
 //adds a new node after the last one and moves "last" to next
@@ -163,28 +156,39 @@ void displayStack(Node* &headOfStack){
     }
   }
 }
+/*
+TODO:
+might wanna replace the numbers in sortToken with constants but k
+
+ */
+
 
 
 // sort token onto stack or queue based on what it is
-void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token){
+// uses shunting yard algorithm
+void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token){
   int tokPNum = checkPrecedence(token); //the p in pNum stands for precendence
-  int topTypeQueue = checkType(headOfQueue);
-  int topTypeStack = checkType(headOfStack);
-  int topPNum = checkPrecedence(headOfStack); //precedence num of stack head
+  char* topDataQ = new char[100];
+  strcpy(topDataQ, headOfQueue->data);
+  char* topDataS = new char[100];
+  strcpy(topDataS, headOfStack->data);
+  int topTypeQueue = checkType(topDataQ);
+  int topTypeStack = checkType(topDataS);
+  int topPNum = checkPrecedence(topDataS); //precedence num of stack head
   char* data = new char[100];
-  if(tokenType == 1){ //it is a number
+  if(isdigit(token[0])){
     enqueue(headOfQueue, token);
   }
-  else if(tokenType == 2){ //it is a left parenthesis
+  else if(tokenType == 1){ //it is a left parenthesis
     push(headOfStack, token);
   }
-  else if(tokenType == 3){ //it is a right parenthesis
-    while(topTypeStack != 2){ //while not left parenthesis
+  else if(tokenType == 2){ //it is a right parenthesis
+    while(topTypeStack != 1){ //while not left parenthesis
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
     } //out of while, meaning found L Parenthesis
     data = pop(headOfQueue);
-    delete(data);
+    //TODO: MOVE DATA INTO GARBAGE STACK
     if(headOfStack != NULL){
       while(headOfStack != NULL){
 	data = pop(headOfStack);
@@ -192,10 +196,10 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token
       }
     }
   }
-  else if(tokenType == 4){ //it is an operator
-    while(headOfQueue != NULL && topPNum > tokPNum ||
-	  headOfQueue != NULL && topPNum == tokPNum &&
-	  topTypeQueue != 2) { //maybe replace this later with LBRACK
+  else if(tokenType == 3 || tokenType == 4){ //it is an operator
+    while((headOfQueue != NULL && topPNum > tokPNum) ||
+	  (headOfQueue != NULL && topPNum == tokPNum &&
+	   topTypeQueue != 1)) { 
       //pop from stack onto queue
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
@@ -209,40 +213,38 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token
 
 //checks the type of token, returns a num based on type.
 //this num can also be used to show precedence
-// 1 = num, 2 = ( , 3 = ) , 4 = + or -, 5 = / or *, 6 = ^
-int checkType(char token){
-  if((int)token >= ZERO && <= NINE){
-    return 1; //this is a number
+// 1 = ( , 2 = ) , 3 = + or -, 4 = / or *, 5 = ^
+int checkType(char* token){
+  if(strcmp(token, "(") == 0){
+    return 1; // this is a left parenthesis
   }
-  if((int) token == LPAR){
-    return 2; // this is a left parenthesis
+  if(strcmp(token, ")") == 0){
+    return 2; //this is a right parenthesis
   }
-  if((int) token == RPAR){
-    return 3; //this is a right parenthesis
+  if(strcmp(token, "-") == 0 || strcmp(token, "+") == 0){
+    return 3; //this is a + or -
   }
-  if((int) token == ADD || (int) token == SUB){
-    return 4; //this is a + or -
+  if(strcmp(token, "*") == 0 || strcmp(token, "/") == 0){
+    return 4; //this is a / or *
   }
-  if((int) token == DIV || (int) token == MULT){
-    return 5; //this is a / or *
-  }
-  if((int) token == POW){
-    return 6; //this is a ^
+  if(strcmp(token, "^") == 0){
+    return 5; //this is a ^
   }
   return 0;
 }
 
-int checkPrecendence(char token){
+int checkPrecendence(char* token){
   int tokenType = checkType(token);
   if(tokenType == 5){ //highest precedence: ^
     return 3;
   }
-  else if(tokenType == 5){
+  else if(tokenType == 4){
     return 2; //medium precendence: * and /
   }
-  else if(tokenType == 4){
+  else if(tokenType == 3){
     return 1; //lowest precedence: + and -
   }
+  return 0;
 }
 
 int main(){
@@ -290,9 +292,6 @@ int main(){
       cout << "That was not a valid choice. Please try again: " << endl;
     }
   }
-  cout << "poop" << endl;
-  strcpy(parsed, parseInput(input));
-  cout << "pee" << endl;
-  cout << " :) " << parsed << endl;
+
   return 0;
 }
