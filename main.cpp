@@ -12,8 +12,8 @@ using namespace std;
 //ascii values for legal input options
 #define ZERO 48
 #define NINE 57
-#define LBRACK 40
-#define RBRACK 41
+#define LPAR 40
+#define RPAR 41
 #define MULT 42
 #define ADD 43
 #define SUB 45
@@ -164,21 +164,42 @@ void displayStack(Node* &headOfStack){
   }
 }
 
+
 // sort token onto stack or queue based on what it is
 void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token){
-  int pNum = checkPrecedence(token); //the p in pNum stands for precendence
+  int tokPNum = checkPrecedence(token); //the p in pNum stands for precendence
+  int topTypeQueue = checkType(headOfQueue);
+  int topTypeStack = checkType(headOfStack);
+  int topPNum = checkPrecedence(headOfStack); //precedence num of stack head
+  char* data = new char[100];
   if(tokenType == 1){ //it is a number
-    push(headOfStack, token);
+    enqueue(headOfQueue, token);
   }
   else if(tokenType == 2){ //it is a left parenthesis
     push(headOfStack, token);
   }
   else if(tokenType == 3){ //it is a right parenthesis
-    //oh god we deal with this later
+    while(topTypeStack != 2){ //while not left parenthesis
+      data = pop(headOfStack);
+      enqueue(headOfQueue, data);
+    } //out of while, meaning found L Parenthesis
+    data = pop(headOfQueue);
+    delete(data);
+    if(headOfStack != NULL){
+      while(headOfStack != NULL){
+	data = pop(headOfStack);
+	enqueue(headOfQueue, data);
+      }
+    }
   }
   else if(tokenType == 4){ //it is an operator
-    while(headOfQueue != NULL && pNum) {
-
+    while(headOfQueue != NULL && topPNum > tokPNum ||
+	  headOfQueue != NULL && topPNum == tokPNum &&
+	  topTypeQueue != 2) { //maybe replace this later with LBRACK
+      //pop from stack onto queue
+      data = pop(headOfStack);
+      enqueue(headOfQueue, data);
+      push(headOfStack, token);
     }
   }
   else { //something's wrong if this else fires
@@ -188,44 +209,38 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char token
 
 //checks the type of token, returns a num based on type.
 //this num can also be used to show precedence
-// 1 = num, 2 = ( , 3 = ) , 4 = +, 5 = -, 6 = /, 7 = *, 8 = ^
+// 1 = num, 2 = ( , 3 = ) , 4 = + or -, 5 = / or *, 6 = ^
 int checkType(char token){
   if((int)token >= ZERO && <= NINE){
     return 1; //this is a number
   }
-  else if((int) token == LBRACK){
-    return 2; // this is a left bracket
+  if((int) token == LPAR){
+    return 2; // this is a left parenthesis
   }
-  else if((int) token == RBRACK){
-    return 3; //this is a right bracket
+  if((int) token == RPAR){
+    return 3; //this is a right parenthesis
   }
-  else if((int) token == ADD){
-    return 4; //this is a +
+  if((int) token == ADD || (int) token == SUB){
+    return 4; //this is a + or -
   }
-  else if((int) token == SUB){
-    return 5; //this is a -
+  if((int) token == DIV || (int) token == MULT){
+    return 5; //this is a / or *
   }
-  else if((int) token == DIV){
-    return 6; //this is a /
-  }
-  else if((int) token == MULT){
-    return 7; //this is a *
-  }
-  else if((int) token == POW){
-    return 8; //this is a ^
+  if((int) token == POW){
+    return 6; //this is a ^
   }
   return 0;
 }
 
 int checkPrecendence(char token){
   int tokenType = checkType(token);
-  if(tokenType == 8){ //highest precedence: ^
+  if(tokenType == 5){ //highest precedence: ^
     return 3;
   }
-  else if(tokenType == 6 || tokenType == 7){
+  else if(tokenType == 5){
     return 2; //medium precendence: * and /
   }
-  else if(tokenType == 4 || tokenType == 5){
+  else if(tokenType == 4){
     return 1; //lowest precedence: + and -
   }
 }
