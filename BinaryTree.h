@@ -10,7 +10,7 @@ public:
   btNode* getLeftPtr();
 
 private:
-  char* data;
+  char data[10];
   btNode *leftPtr;
   btNode *rightPtr;
 };

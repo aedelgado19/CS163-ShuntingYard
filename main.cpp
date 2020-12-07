@@ -39,38 +39,66 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
 int checkPrecedence(char* token);
 // Binary Tree functions ***********************
 btNode* createTree(Node* &headOfQueue);
+void visualPrint(Node* headOfQueue, int depth);
 // *********************************************
 
-//takes in postfix queue
+//uses the same algorithm as my previous Heap program
+void visualPrint(btNode* topOfStack, int depth){
+  if(topOfStack == NULL){
+    return;
+  }
+
+  //print top child (right)
+  visualPrint(topOfStack->getRightPtr(), depth+1);
+  
+  //spacing
+  for(int i = 0; i < depth; i++){
+    cout << "    ";
+  }
+  cout << topOfStack->getData() << endl;
+
+  //bottom child(left)
+  visualPrint(topOfStack->getLeftPtr(), depth+1);
+}
+
+/*
+takes in postfix queue
+algorithm from https://www.geeksforgeeks.org/expression-tree/
+1. if token is a number, it is pushed onto stack
+2. if token is an operator, pop the top 2 values from the stack
+and make them the child of the new node, push current node
+*/
 btNode* createTree(Node *&headOfQueue){
-  stack <btNode*> btStack; 
-  while(headOfQueue != NULL){
-    //if it's an operator
+  stack <btNode*> *btStack = new stack<btNode*>; 
+  Node *currentNode = headOfQueue;
+  while(currentNode != NULL){
+    //if it's a number
     if(isdigit(headOfQueue->data[0])){
       btNode* newnode = new btNode();
       newnode->setData(headOfQueue->data);
-      btStack.push(newnode);
+      btStack->push(newnode);
     } else { //it's  an operator
       btNode* newnode = new btNode();
       
       //pop first 2 nodes
       btNode* rChild = new btNode();
-      rChild = btStack.top();
-      btStack.pop();
+      rChild = btStack->top();
+      btStack->pop();
       btNode* lChild = new btNode();
-      lChild = btStack.top();
-      btStack.pop();
+      lChild = btStack->top();
+      btStack->pop();
 
       //save as children
       newnode->setRightPtr(rChild);
       newnode->setLeftPtr(lChild);
-      btStack.push(newnode);
-    }
+      btStack->push(newnode);
+    }    
+    currentNode = currentNode->next;
   }
   
   //all that's left is top of tree
-  btNode* topOfStack = btStack.top();
-  btStack.pop();
+  btNode* topOfStack = btStack->top();
+  btStack->pop();
   return topOfStack;
 }
 
@@ -284,6 +312,7 @@ int checkPrecedence(char* token){
 }
 
 int main(){
+  btNode* top = NULL;
   Node* headOfStack = NULL;
   Node* headOfQueue = NULL;  
   char* parsed = new char[100];
@@ -310,7 +339,9 @@ int main(){
     enqueue(headOfQueue, pop(headOfStack));
   }
   displayQueue(headOfQueue);
-
+  top = createTree(headOfQueue);
+  cout << "Tree: " << endl;
+  visualPrint(top, 0);
   /*
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
