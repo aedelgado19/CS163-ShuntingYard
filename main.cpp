@@ -40,7 +40,34 @@ int checkPrecedence(char* token);
 // Binary Tree functions ***********************
 btNode* createTree(Node* &headOfQueue);
 void visualPrint(Node* headOfQueue, int depth);
+void postToIn(btNode* topOfStack);
+void postToPre(btNode* topOfStack);
 // *********************************************
+
+void postToIn(btNode* topOfStack){
+  if(topOfStack != NULL){
+    postToIn(topOfStack->getLeftPtr());
+    cout << topOfStack->getData() << " ";
+    postToIn(topOfStack->getRightPtr());
+  }
+}
+
+void postToPre(btNode* topOfStack){
+  if(topOfStack != NULL){
+    cout << topOfStack->getData() << " ";
+    postToPre(topOfStack->getLeftPtr());
+    postToPre(topOfStack->getRightPtr());
+
+  }
+}
+
+void postToPost(btNode* topOfStack){
+  if(topOfStack != NULL){
+    postToPost(topOfStack->getLeftPtr());
+    postToPost(topOfStack->getRightPtr());
+    cout << topOfStack->getData() << " ";
+  }
+}
 
 //uses the same algorithm as my previous Heap program
 void visualPrint(btNode* topOfStack, int depth){
@@ -144,7 +171,6 @@ char* dequeue(Node* &headOfQueue){
 
 //displays entire queue
 void displayQueue(Node* &headOfQueue){
-  cout << "Queue: " ;
   if(headOfQueue != NULL){
     Node* traverse = headOfQueue;
     cout << traverse->data;
@@ -320,10 +346,12 @@ int main(){
   int choice = 0;
   bool valid = false;
   int tokenType = 0;
+  cout << "******************" << endl;
   cout << "Welcome to Shunting Yard." << endl;
   cout << "Please enter your mathematical expression in INFIX notation. " << endl;
   cout << "Use spaces to separate each token, including parenthesis." << endl;
   cout << "Acceptable tokens: +, -, *, /, ^, ( ), and integer numbers." << endl;
+  cout << "******************" << endl;
   cin.get(input, 100);
   cin.get();
 
@@ -338,11 +366,12 @@ int main(){
   while(headOfStack != NULL){
     enqueue(headOfQueue, pop(headOfStack));
   }
+  cout << "Postfix: ";
   displayQueue(headOfQueue);
   top = createTree(headOfQueue);
   cout << "Tree: " << endl;
   visualPrint(top, 0);
-  /*
+  
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
     cout << "(1) infix notation" << endl;
@@ -350,19 +379,29 @@ int main(){
     cout << "(3) postfix notation" << endl;
     cin >> choice;
     cin.get();
+    cout << endl;
     if (choice == 1){ //infix
-
+      cout << "infix: ";
+      postToIn(top);
+      cout << endl;
+      valid = true;
     }
     else if (choice == 2){ //prefix
-
+      cout << "prefix: ";
+      postToPre(top);
+      cout << endl;
+      valid = true;
     }
-    else if (choice == 3){ //postfix
-
+    else if (choice == 3){ //postfix.. again.
+      cout << "postfix: ";
+      postToPost(top);
+      cout << endl;
+      valid = true;
     }
     else {
       cout << "That was not a valid choice. Please try again: " << endl;
     }
-    } */
+  }
 
   return 0;
 }
