@@ -233,7 +233,7 @@ int checkType(char* token){
   return 0;
 }
 
-int checkPrecendence(char* token){
+int checkPrecedence(char* token){
   int tokenType = checkType(token);
   if(tokenType == 5){ //highest precedence: ^
     return 3;
