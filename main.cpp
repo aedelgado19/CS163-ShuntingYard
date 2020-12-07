@@ -358,7 +358,7 @@ int main(){
   Node* headOfQueue = NULL;  
   char* parsed = new char[100];
   char input[100];
-  int choice = 0;
+  char choice[10];
   bool valid = false;
   int tokenType = 0;
 
@@ -398,22 +398,22 @@ int main(){
     cout << "(1) infix notation" << endl;
     cout << "(2) prefix notation" << endl;
     cout << "(3) postfix notation" << endl;
-    cin >> choice;
+    cin.get(choice, 10);
     cin.get();
     cout << endl;
-    if (choice == 1){ //infix
+    if (strcmp(choice, "1") == 0){ //infix
       cout << "infix: ";
       postToIn(top);
       cout << endl;
       valid = true;
     }
-    else if (choice == 2){ //prefix
+    else if (strcmp(choice, "2") == 0){ //prefix
       cout << "prefix: ";
       postToPre(top);
       cout << endl;
       valid = true;
     }
-    else if (choice == 3){ //postfix.. again.
+    else if (strcmp(choice, "3") == 0){ //postfix.. again.
       cout << "postfix: ";
       postToPost(top);
       cout << endl;
