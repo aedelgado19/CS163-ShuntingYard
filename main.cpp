@@ -73,13 +73,13 @@ btNode* createTree(Node *&headOfQueue){
   Node *currentNode = headOfQueue;
   while(currentNode != NULL){
     //if it's a number
-    if(isdigit(headOfQueue->data[0])){
+    if(isdigit(currentNode->data[0])){
       btNode* newnode = new btNode();
-      newnode->setData(headOfQueue->data);
+      newnode->setData(currentNode->data);
       btStack->push(newnode);
     } else { //it's  an operator
       btNode* newnode = new btNode();
-      
+      newnode->setData(currentNode->data);
       //pop first 2 nodes
       btNode* rChild = new btNode();
       rChild = btStack->top();
