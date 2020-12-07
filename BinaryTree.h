@@ -8,7 +8,7 @@ public:
   char* getData();
   btNode* getRightPtr();
   btNode* getLeftPtr();
-  
+
 private:
   char* data;
   btNode *leftPtr;

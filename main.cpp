@@ -1,11 +1,12 @@
-/* Author: Allison DOAelgado
- * Last updated: December 5, 2020
+/* Author: Allison Delgado
+ * Last updated: December 6, 2020
  * This program uses the Shunting Yard Algorithm to
  * turn an infix expression into prefix, infix, or postfix notation
  */
 
 #include <iostream>
 #include <cstring>
+#include <stack>
 #include "BinaryTree.h"
 using namespace std;
 
@@ -36,7 +37,42 @@ void displayQueue(Node* &headOfQueue);
 int checkType(char* token);
 void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token);
 int checkPrecedence(char* token);
+// Binary Tree functions ***********************
+btNode* createTree(Node* &headOfQueue);
 // *********************************************
+
+//takes in postfix queue
+btNode* createTree(Node *&headOfQueue){
+  stack <btNode*> btStack; 
+  while(headOfQueue != NULL){
+    //if it's an operator
+    if(isdigit(headOfQueue->data[0])){
+      btNode* newnode = new btNode();
+      newnode->setData(headOfQueue->data);
+      btStack.push(newnode);
+    } else { //it's  an operator
+      btNode* newnode = new btNode();
+      
+      //pop first 2 nodes
+      btNode* rChild = new btNode();
+      rChild = btStack.top();
+      btStack.pop();
+      btNode* lChild = new btNode();
+      lChild = btStack.top();
+      btStack.pop();
+
+      //save as children
+      newnode->setRightPtr(rChild);
+      newnode->setLeftPtr(lChild);
+      btStack.push(newnode);
+    }
+  }
+  
+  //all that's left is top of tree
+  btNode* topOfStack = btStack.top();
+  btStack.pop();
+  return topOfStack;
+}
 
 //adds a new node after the last one and moves "last" to next
 void enqueue(Node* &headOfQueue, char* inData){

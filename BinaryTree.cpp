@@ -9,13 +9,11 @@ void btNode::setData(char *inputdata){
 }
 
 void btNode::setRightPtr(btNode* rPtr){
-  //do this
-
+  rightPtr = rPtr;
 }
 
 void btNode::setLeftPtr(btNode* lPtr){
-  //do this
-
+  leftPtr = lPtr;
 }
 
 char* btNode::getData(){
