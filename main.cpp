@@ -12,6 +12,11 @@ using namespace std;
 //ascii values for legal input options
 #define ZERO 48
 #define NINE 57
+#define LPAR 1
+#define RPAR 2
+#define ADD_OR_SUB 3
+#define MULT_OR_DIV 4
+#define POW 5
 
 struct Node{
   char* data;
@@ -179,11 +184,11 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
   if(isdigit(token[0])){
     enqueue(headOfQueue, token);
   }
-  else if(tokenType == 1){ //it is a left parenthesis
+  else if(tokenType == LPAR){ //it is a left parenthesis
     push(headOfStack, token);
   }
-  else if(tokenType == 2){ //it is a right parenthesis
-    while(topTypeStack != 1){ //while not left parenthesis
+  else if(tokenType == RPAR){ //it is a right parenthesis
+    while(topTypeStack != LPAR){ //while not left parenthesis
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
     } //out of while, meaning found L Parenthesis
@@ -196,10 +201,10 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
       }
     }
   }
-  else if(tokenType == 3 || tokenType == 4){ //it is an operator
+  else if(tokenType == ADD_OR_SUB || tokenType == MULT_OR_DIV){ //it is an operator
     while((headOfQueue != NULL && topPNum > tokPNum) ||
 	  (headOfQueue != NULL && topPNum == tokPNum &&
-	   topTypeQueue != 1)) { 
+	   topTypeQueue != LPAR)) { 
       //pop from stack onto queue
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
@@ -212,36 +217,35 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
 }
 
 //checks the type of token, returns a num based on type.
-//this num can also be used to show precedence
-// 1 = ( , 2 = ) , 3 = + or -, 4 = / or *, 5 = ^
+//check #define 's at top
 int checkType(char* token){
   if(strcmp(token, "(") == 0){
-    return 1; // this is a left parenthesis
+    return LPAR; 
   }
   if(strcmp(token, ")") == 0){
-    return 2; //this is a right parenthesis
+    return RPAR; 
   }
   if(strcmp(token, "-") == 0 || strcmp(token, "+") == 0){
-    return 3; //this is a + or -
+    return ADD_OR_SUB; 
   }
   if(strcmp(token, "*") == 0 || strcmp(token, "/") == 0){
-    return 4; //this is a / or *
+    return MULT_OR_DIV;
   }
   if(strcmp(token, "^") == 0){
-    return 5; //this is a ^
+    return POW;
   }
   return 0;
 }
 
 int checkPrecedence(char* token){
   int tokenType = checkType(token);
-  if(tokenType == 5){ //highest precedence: ^
+  if(tokenType == POW){ //highest precedence: ^
     return 3;
   }
-  else if(tokenType == 4){
+  else if(tokenType == MULT_OR_DIV){
     return 2; //medium precendence: * and /
   }
-  else if(tokenType == 3){
+  else if(tokenType == ADD_OR_SUB){
     return 1; //lowest precedence: + and -
   }
   return 0;
