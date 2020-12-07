@@ -10,7 +10,7 @@
 #include "BinaryTree.h"
 using namespace std;
 
-//ascii values for legal input options
+//ascii values for legal input options and also operations
 #define ZERO 48
 #define NINE 57
 #define LPAR 1
@@ -33,10 +33,12 @@ void displayStack(Node* &headOfStack);
 void enqueue(Node*& headOfQueue, char* inData);
 char* dequeue(Node*& headOfQueue);
 void displayQueue(Node* &headOfQueue);
+
 // Shunting Yard functions *********************
 int checkType(char* token);
 void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token);
 int checkPrecedence(char* token);
+
 // Binary Tree functions ***********************
 btNode* createTree(Node* &headOfQueue);
 void visualPrint(Node* headOfQueue, int depth);
@@ -44,7 +46,9 @@ void postToIn(btNode* topOfStack);
 void postToPre(btNode* topOfStack);
 // *********************************************
 
+//converts postfix to infix using recursion
 void postToIn(btNode* topOfStack){
+  //infix is x + y
   if(topOfStack != NULL){
     postToIn(topOfStack->getLeftPtr());
     cout << topOfStack->getData() << " ";
@@ -52,16 +56,20 @@ void postToIn(btNode* topOfStack){
   }
 }
 
+//converts postfix to prefix using recursion
 void postToPre(btNode* topOfStack){
+  //prefix is + x y
   if(topOfStack != NULL){
     cout << topOfStack->getData() << " ";
     postToPre(topOfStack->getLeftPtr());
     postToPre(topOfStack->getRightPtr());
-
   }
 }
 
+//converts postfix to postfix using recursion
+//seems redundant i know, but gotta use the tree
 void postToPost(btNode* topOfStack){
+  //postfix is x y +
   if(topOfStack != NULL){
     postToPost(topOfStack->getLeftPtr());
     postToPost(topOfStack->getRightPtr());
@@ -69,7 +77,8 @@ void postToPost(btNode* topOfStack){
   }
 }
 
-//uses the same algorithm as my previous Heap program
+//uses the same algorithm as my previous Heap program,
+//prints a horizontal tree
 void visualPrint(btNode* topOfStack, int depth){
   if(topOfStack == NULL){
     return;
@@ -119,13 +128,14 @@ btNode* createTree(Node *&headOfQueue){
       newnode->setRightPtr(rChild);
       newnode->setLeftPtr(lChild);
       btStack->push(newnode);
-    }    
+    }
+    //update current node
     currentNode = currentNode->next;
   }
   
   //all that's left is top of tree
   btNode* topOfStack = btStack->top();
-  btStack->pop();
+  btStack->pop(); //remove top
   return topOfStack;
 }
 
@@ -135,18 +145,20 @@ void enqueue(Node* &headOfQueue, char* inData){
   Node* traverse = NULL;
   int dataSize = strlen(inData);
   newnode->data = new char[dataSize];
-  if(headOfQueue == NULL){ //no head yet, so make head
+
+  //no head yet, so make head
+  if(headOfQueue == NULL){
     headOfQueue = newnode;
     strcpy(newnode->data, inData);
     newnode->next = NULL;
-  } else {
+  } else { //not making head
     traverse = headOfQueue;
-    while(traverse->next != NULL){
+    while(traverse->next != NULL){ //find end of list
       traverse = traverse->next;
     }
     //out of loop, found end
-    traverse->next = newnode;
-    strcpy(newnode->data, inData);
+    traverse->next = newnode; //attach
+    strcpy(newnode->data, inData); 
     newnode->next = NULL;
   }
 }
@@ -154,7 +166,7 @@ void enqueue(Node* &headOfQueue, char* inData){
 //removes top node and makes next node to "top"
 char* dequeue(Node* &headOfQueue){
   Node* temp = NULL;
-  if(headOfQueue != NULL){
+  if(headOfQueue != NULL){ //theres stuff in the list
     int dataSize = strlen(headOfQueue->data); //used in line below
     char* backupData = new char[dataSize];
     temp = headOfQueue; //copy original head
@@ -174,7 +186,7 @@ void displayQueue(Node* &headOfQueue){
   if(headOfQueue != NULL){
     Node* traverse = headOfQueue;
     cout << traverse->data;
-    while(traverse->next != NULL){
+    while(traverse->next != NULL){ //traverse thru list
       traverse = traverse->next;
       cout << " " << traverse->data;
     }
@@ -187,11 +199,13 @@ void push(Node* &headOfStack, char* inData){
   Node* newnode = new Node;
   int dataSize = strlen(inData);
   newnode->data = new char[dataSize];
+
+  //create new head
   if(headOfStack == NULL){
     headOfStack = newnode;
     strcpy(newnode->data, inData);
     newnode->next = NULL;
-  } else {
+  } else { //otherwise make new node, attach its next to head
     newnode->next = headOfStack;
     newnode->data = inData;
     headOfStack = newnode;
@@ -208,7 +222,7 @@ bool isEmpty(Node *&head){
   }
 }
 
-//returns top element
+//returns top element's data
 char* peek(Node *&headOfStack){
   bool empty = isEmpty(headOfStack);
   if(empty == false){ 
@@ -229,7 +243,7 @@ char* pop(Node* &headOfStack){
     headOfStack = headOfStack->next; //new "head"
     temp->next = NULL; //disconnect original from next
     strcpy(backupData, temp->data);
-    delete(temp);
+    delete(temp); //delete original head
     return backupData;
   } else {
     cout << "head of stack is null!" << endl;
@@ -258,6 +272,7 @@ void displayStack(Node* &headOfStack){
 // uses shunting yard algorithm
 void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token){
   int tokPNum = checkPrecedence(token); //the p in pNum stands for precendence
+  char* discard; //used to store garbage later
   char* topDataQ = new char[100];
   char* topDataS = new char[100];
   int topTypeStack = 0;
@@ -273,8 +288,7 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
     topPNum = checkPrecedence(topDataS); //prec. num of stack head
   }
   
-  char* discard;
-  if(isdigit(token[0])){
+  if(isdigit(token[0])){ //if it's a number
     enqueue(headOfQueue, token);
   }
   else if(tokenType == LPAR){ //it is a left parenthesis
@@ -295,7 +309,7 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
       //pop from stack onto queue
       enqueue(headOfQueue, pop(headOfStack));
     }
-    push(headOfStack, token);
+    push(headOfStack, token); //push token to stack
   }
   else { //something's wrong if this else fires
     cout << "Error in sorting token, unknown token is passed." << endl;
@@ -303,7 +317,7 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
 }
 
 //checks the type of token, returns a num based on type.
-//check #define 's at top
+//see #define 's at top
 int checkType(char* token){
   if(strcmp(token, "(") == 0){
     return LPAR; 
@@ -323,6 +337,7 @@ int checkType(char* token){
   return 0;
 }
 
+//checks precedence using PEMDAS (higher num = highest prec)
 int checkPrecedence(char* token){
   int tokenType = checkType(token);
   if(tokenType == POW){ //highest precedence: ^
@@ -346,6 +361,8 @@ int main(){
   int choice = 0;
   bool valid = false;
   int tokenType = 0;
+
+  //welcome messages
   cout << "******************" << endl;
   cout << "Welcome to Shunting Yard." << endl;
   cout << "Please enter your mathematical expression in INFIX notation. " << endl;
@@ -355,23 +372,27 @@ int main(){
   cin.get(input, 100);
   cin.get();
 
-  //parse input
+  //parse input using tokenizer
   char *token = strtok(input, " ");
   while(token != NULL){
     tokenType = checkType(token);
     sortToken(headOfStack, headOfQueue, tokenType, token);
     token = strtok(NULL, " ");
   }
-  
+
+  //enqueue the head of stack
   while(headOfStack != NULL){
     enqueue(headOfQueue, pop(headOfStack));
   }
+
+  //print out results using postfix and also the tree
   cout << "Postfix: ";
   displayQueue(headOfQueue);
   top = createTree(headOfQueue);
   cout << "Tree: " << endl;
   visualPrint(top, 0);
-  
+
+  //keep looping until they type something valid
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
     cout << "(1) infix notation" << endl;
@@ -398,10 +419,9 @@ int main(){
       cout << endl;
       valid = true;
     }
-    else {
+    else { //oops! they made a typo
       cout << "That was not a valid choice. Please try again: " << endl;
     }
   }
-
   return 0;
 }

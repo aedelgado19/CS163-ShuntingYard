@@ -1,4 +1,6 @@
-//binary tree node class. contains left and right pointer
+// Author: Allison Delgado, last updated Dec 6, 2020
+// binary tree node class. contains getters and setters for
+// right and left ptrs, and data
 #include "BinaryTree.h"
 #include <iostream>
 #include <cstring>
