@@ -40,6 +40,7 @@ int checkPrecedence(char* token);
 
 //adds a new node after the last one and moves "last" to next
 void enqueue(Node* &headOfQueue, char* inData){
+  cout << "enqueueing: " << inData << endl;
   Node* newnode = new Node;
   Node* traverse = NULL;
   int dataSize = strlen(inData);
@@ -48,10 +49,12 @@ void enqueue(Node* &headOfQueue, char* inData){
     headOfQueue = newnode;
     strcpy(newnode->data, inData);
     newnode->next = NULL;
+    cout << "enqueue: made head" << endl;
   } else {
     traverse = headOfQueue;
     while(traverse->next != NULL){
       traverse = traverse->next;
+      cout << "enqueue: making not head" << endl;
     }
     //out of loop, found end
     traverse->next = newnode;
@@ -94,6 +97,7 @@ void displayQueue(Node* &headOfQueue){
 
 //takes in data, creates a new node, and stacks it on top of stack LL
 void push(Node* &headOfStack, char* inData){
+  cout << "pushing : " << inData << " to stack" << endl;
   Node* newnode = new Node;
   int dataSize = strlen(inData);
   newnode->data = new char[dataSize];
@@ -120,6 +124,7 @@ bool isEmpty(Node *&head){
 
 //returns top element
 char* peek(Node *&headOfStack){
+  cout << "peeking at stack" << endl;
   bool empty = isEmpty(headOfStack);
   if(empty == false){ 
     return headOfStack->data;
@@ -131,6 +136,7 @@ char* peek(Node *&headOfStack){
 
 //delete head of stack
 char* pop(Node* &headOfStack){
+  cout << "popping stack" << endl;
   Node* temp = new Node;
   if(headOfStack != NULL){
     int dataSize = strlen(headOfStack->data); //used in line below
@@ -140,6 +146,7 @@ char* pop(Node* &headOfStack){
     temp->next = NULL; //disconnect original from next
     strcpy(backupData, temp->data);
     delete(temp);
+    cout << "popped: " << backupData << endl;
     return backupData;
   } else {
     cout << "head of stack is null!" << endl;
@@ -161,33 +168,38 @@ void displayStack(Node* &headOfStack){
     }
   }
 }
-/*
-TODO:
-might wanna replace the numbers in sortToken with constants but k
-
- */
-
-
 
 // sort token onto stack or queue based on what it is
 // uses shunting yard algorithm
 void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* token){
   int tokPNum = checkPrecedence(token); //the p in pNum stands for precendence
   char* topDataQ = new char[100];
-  strcpy(topDataQ, headOfQueue->data);
   char* topDataS = new char[100];
-  strcpy(topDataS, headOfStack->data);
-  int topTypeQueue = checkType(topDataQ);
-  int topTypeStack = checkType(topDataS);
-  int topPNum = checkPrecedence(topDataS); //precedence num of stack head
+  int topTypeStack = 0;
+  int topPNum = 0;
+  int topTypeQueue = 0;
+  if(headOfQueue != NULL){
+    strcpy(topDataQ, headOfQueue->data);
+    topTypeQueue = checkType(topDataQ);
+    cout << "in headOfQueue != NULL" << endl;
+  }
+  if(headOfStack != NULL){
+    strcpy(topDataS, headOfStack->data);
+    cout << "int headOfStack != NULL" << endl;
+    topTypeStack = checkType(topDataS);
+    topPNum = checkPrecedence(topDataS); //prec. num of stack head
+  }
   char* data = new char[100];
   if(isdigit(token[0])){
     enqueue(headOfQueue, token);
+    cout << "if isdigit, enqueue" << endl;
   }
   else if(tokenType == LPAR){ //it is a left parenthesis
+    cout << "found out it's a left parenthesis" << endl;
     push(headOfStack, token);
   }
   else if(tokenType == RPAR){ //it is a right parenthesis
+    cout << "found out rpar" << endl;
     while(topTypeStack != LPAR){ //while not left parenthesis
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
@@ -202,13 +214,16 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
     }
   }
   else if(tokenType == ADD_OR_SUB || tokenType == MULT_OR_DIV){ //it is an operator
+    cout << "an operator" << endl;
     while((headOfQueue != NULL && topPNum > tokPNum) ||
 	  (headOfQueue != NULL && topPNum == tokPNum &&
-	   topTypeQueue != LPAR)) { 
+	   topTypeQueue != LPAR)) {
+      cout << "while inside else if fired (operator)!" << endl;
       //pop from stack onto queue
       data = pop(headOfStack);
       enqueue(headOfQueue, data);
       push(headOfStack, token);
+      cout << "did all of the stuff in operator else if" << endl;
     }
   }
   else { //something's wrong if this else fires
@@ -220,15 +235,18 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
 //check #define 's at top
 int checkType(char* token){
   if(strcmp(token, "(") == 0){
+    cout << "it's a lpar" << endl;
     return LPAR; 
   }
   if(strcmp(token, ")") == 0){
     return RPAR; 
   }
   if(strcmp(token, "-") == 0 || strcmp(token, "+") == 0){
+    cout << "it's a + or -" << endl;
     return ADD_OR_SUB; 
   }
   if(strcmp(token, "*") == 0 || strcmp(token, "/") == 0){
+    cout << "its * or /" << endl;
     return MULT_OR_DIV;
   }
   if(strcmp(token, "^") == 0){
@@ -238,6 +256,7 @@ int checkType(char* token){
 }
 
 int checkPrecedence(char* token){
+  cout << "checking precedence" << endl;
   int tokenType = checkType(token);
   if(tokenType == POW){ //highest precedence: ^
     return 3;
@@ -270,12 +289,12 @@ int main(){
   char *token = strtok(input, " ");
   while(token != NULL){
     token = strtok(NULL, " ");
+    cout << "token right now: " << token << endl;
     tokenType = checkType(token);
     sortToken(headOfStack, headOfQueue, tokenType, token);
   }
-  
-  
-  //outputting choices
+  cout << "out of while loop" << endl;
+  /*
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
     cout << "(1) infix notation" << endl;
@@ -295,7 +314,7 @@ int main(){
     else {
       cout << "That was not a valid choice. Please try again: " << endl;
     }
-  }
+    } */
 
   return 0;
 }
