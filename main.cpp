@@ -49,12 +49,10 @@ void enqueue(Node* &headOfQueue, char* inData){
     headOfQueue = newnode;
     strcpy(newnode->data, inData);
     newnode->next = NULL;
-    cout << "enqueue: made head" << endl;
   } else {
     traverse = headOfQueue;
     while(traverse->next != NULL){
       traverse = traverse->next;
-      cout << "enqueue: making not head" << endl;
     }
     //out of loop, found end
     traverse->next = newnode;
@@ -81,7 +79,7 @@ char* dequeue(Node* &headOfQueue){
   return NULL;
 }
 
-//used for debug, displays entire queue
+//displays entire queue
 void displayQueue(Node* &headOfQueue){
   int count = 1;
   if(headOfQueue != NULL){
@@ -178,53 +176,47 @@ void sortToken(Node* &headOfStack, Node* &headOfQueue, int tokenType, char* toke
   int topTypeStack = 0;
   int topPNum = 0;
   int topTypeQueue = 0;
-  if(headOfQueue != NULL){
+  if(headOfQueue != NULL){ //set up queue variables
     strcpy(topDataQ, headOfQueue->data);
     topTypeQueue = checkType(topDataQ);
     cout << "in headOfQueue != NULL" << endl;
   }
-  if(headOfStack != NULL){
+  if(headOfStack != NULL){ //set up stack variables
     strcpy(topDataS, headOfStack->data);
     cout << "int headOfStack != NULL" << endl;
     topTypeStack = checkType(topDataS);
     topPNum = checkPrecedence(topDataS); //prec. num of stack head
   }
-  char* data = new char[100];
+  
+  char* discard;
   if(isdigit(token[0])){
     enqueue(headOfQueue, token);
     cout << "if isdigit, enqueue" << endl;
   }
   else if(tokenType == LPAR){ //it is a left parenthesis
-    cout << "found out it's a left parenthesis" << endl;
     push(headOfStack, token);
   }
   else if(tokenType == RPAR){ //it is a right parenthesis
     cout << "found out rpar" << endl;
-    while(topTypeStack != LPAR){ //while not left parenthesis
-      data = pop(headOfStack);
-      enqueue(headOfQueue, data);
+    while(strcmp(peek(headOfStack), "(")){//while not left parenthesis
+      enqueue(headOfQueue, pop(headOfStack));
+      
     } //out of while, meaning found L Parenthesis
-    data = pop(headOfQueue);
-    //TODO: MOVE DATA INTO GARBAGE STACK
-    if(headOfStack != NULL){
-      while(headOfStack != NULL){
-	data = pop(headOfStack);
-	enqueue(headOfQueue, data);
-      }
-    }
+    cout << "lol" << endl;
+    discard = pop(headOfStack);
   }
-  else if(tokenType == ADD_OR_SUB || tokenType == MULT_OR_DIV){ //it is an operator
+  else if(tokenType == ADD_OR_SUB || tokenType == MULT_OR_DIV ||
+	  tokenType == POW){ //it is an operator
     cout << "an operator" << endl;
-    while((headOfQueue != NULL && topPNum > tokPNum) ||
-	  (headOfQueue != NULL && topPNum == tokPNum &&
-	   topTypeQueue != LPAR)) {
+    while(headOfStack != NULL && tokenType != POW &&
+	  strcmp(peek(headOfStack), "(") &&
+	  checkPrecedence(peek(headOfStack)) >= tokPNum){
       cout << "while inside else if fired (operator)!" << endl;
       //pop from stack onto queue
-      data = pop(headOfStack);
-      enqueue(headOfQueue, data);
-      push(headOfStack, token);
+      enqueue(headOfQueue, pop(headOfStack));
       cout << "did all of the stuff in operator else if" << endl;
     }
+    push(headOfStack, token);
   }
   else { //something's wrong if this else fires
     cout << "Error in sorting token, unknown token is passed." << endl;
@@ -239,6 +231,7 @@ int checkType(char* token){
     return LPAR; 
   }
   if(strcmp(token, ")") == 0){
+    cout << "checkType(): it's a rpar" << endl;
     return RPAR; 
   }
   if(strcmp(token, "-") == 0 || strcmp(token, "+") == 0){
@@ -288,12 +281,19 @@ int main(){
   //parse input
   char *token = strtok(input, " ");
   while(token != NULL){
-    token = strtok(NULL, " ");
     cout << "token right now: " << token << endl;
     tokenType = checkType(token);
     sortToken(headOfStack, headOfQueue, tokenType, token);
+    token = strtok(NULL, " ");
   }
   cout << "out of while loop" << endl;
+  
+  while(headOfStack != NULL){
+    cout << "pee" << endl;
+    enqueue(headOfQueue, pop(headOfStack));
+  }
+  displayQueue(headOfQueue);
+
   /*
   while(valid == false){
     cout << "Would you like to output the expression in: " << endl;
